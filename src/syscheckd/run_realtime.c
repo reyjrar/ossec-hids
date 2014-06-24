@@ -56,6 +56,37 @@ int realtime_checksumfile(char *file_name)
 {
     char *buf;
 
+    /* Checking if file is to be ignored */
+    if(syscheck.ignore)
+    {
+        int i = 0;
+        while(syscheck.ignore[i] != NULL)
+        {
+            if(strncasecmp(syscheck.ignore[i], file_name,
+                           strlen(syscheck.ignore[i])) == 0)
+            {
+                return(0);
+            }
+
+            i++;
+        }
+    }
+
+    /* Checking in the regex entry */
+    if(syscheck.ignore_regex)
+    {
+        int i = 0;
+        while(syscheck.ignore_regex[i] != NULL)
+        {
+            if(OSMatch_Execute(file_name, strlen(file_name),
+                                          syscheck.ignore_regex[i]))
+            {
+                return(0);
+            }
+            i++;
+        }
+    }
+
     buf = OSHash_Get(syscheck.fp, file_name);
     if(buf != NULL)
     {
@@ -150,6 +181,37 @@ int realtime_start()
 /* Adds a directory to real time checking. */
 int realtime_adddir(char *dir)
 {
+    /* Checking if dir is to be ignored */
+    if(syscheck.ignore)
+    {
+        int i = 0;
+        while(syscheck.ignore[i] != NULL)
+        {
+            if(strncasecmp(syscheck.ignore[i], dir,
+                           strlen(syscheck.ignore[i])) == 0)
+            {
+                return(0);
+            }
+
+            i++;
+        }
+    }
+    /* Checking in the regex entry */
+    if(syscheck.ignore_regex)
+    {
+        int i = 0;
+        while(syscheck.ignore_regex[i] != NULL)
+        {
+            if(OSMatch_Execute(dir, strlen(dir),
+                                          syscheck.ignore_regex[i]))
+            {
+                return(0);
+            }
+            i++;
+        }
+    }
+
+    /* Not ignoring, proceed */
     if(!syscheck.realtime)
     {
         realtime_start();
@@ -324,6 +386,45 @@ void CALLBACK RTCallBack(DWORD dwerror, DWORD dwBytes, LPOVERLAPPED overlap)
         final_path[MAX_LINE] = '\0';
         snprintf(final_path, MAX_LINE, "%s/%s", rtlocald->dir, finalfile);
 
+        /* Checking if dir is to be ignored */
+        if(syscheck.ignore)
+        {
+            int matched, i = 0;
+            while(syscheck.ignore[i] != NULL)
+            {
+                if(strncasecmp(syscheck.ignore[i], dir,
+                            strlen(syscheck.ignore[i])) == 0)
+                {
+                    matched = 1;
+                    break;
+                }
+
+                i++;
+            }
+            if (matched == 1) {
+                // Skip this file
+                continue;
+            }
+        }
+        /* Checking in the regex entry */
+        if(syscheck.ignore_regex)
+        {
+            int matched, i = 0;
+            while(syscheck.ignore_regex[i] != NULL)
+            {
+                if(OSMatch_Execute(dir, strlen(dir),
+                                            syscheck.ignore_regex[i]))
+                {
+                    matched = 1;
+                    break;
+                }
+                i++;
+            }
+            if( matched == 1 ) {
+                // Skip this file
+                continue;
+            }
+        }
 
         /* Checking the change. */
         realtime_checksumfile(final_path);
@@ -388,6 +489,37 @@ int realtime_adddir(char *dir)
     win32rtfim *rtlocald;
 
 
+    /* Checking if dir is to be ignored */
+    if(syscheck.ignore)
+    {
+        int i = 0;
+        while(syscheck.ignore[i] != NULL)
+        {
+            if(strncasecmp(syscheck.ignore[i], dir,
+                           strlen(syscheck.ignore[i])) == 0)
+            {
+                return(0);
+            }
+
+            i++;
+        }
+    }
+    /* Checking in the regex entry */
+    if(syscheck.ignore_regex)
+    {
+        int i = 0;
+        while(syscheck.ignore_regex[i] != NULL)
+        {
+            if(OSMatch_Execute(dir, strlen(dir),
+                                          syscheck.ignore_regex[i]))
+            {
+                return(0);
+            }
+            i++;
+        }
+    }
+
+    /* Not ignoring, proceed */
     if(!syscheck.realtime)
     {
         realtime_start();

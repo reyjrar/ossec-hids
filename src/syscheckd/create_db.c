@@ -335,6 +335,36 @@ int read_dir(char *dir_name, int opts, OSMatch *restriction)
         return(-1);
     }
 
+    /* Checking if directory is to be ignored */
+    if(syscheck.ignore)
+    {
+        int i = 0;
+        while(syscheck.ignore[i] != NULL)
+        {
+            if(strncasecmp(syscheck.ignore[i], dir_name,
+                           strlen(syscheck.ignore[i])) == 0)
+            {
+                return(0);
+            }
+
+            i++;
+        }
+    }
+    /* Checking in the regex entry */
+    if(syscheck.ignore_regex)
+    {
+        int i = 0;
+        while(syscheck.ignore_regex[i] != NULL)
+        {
+            if(OSMatch_Execute(dir_name, strlen(dir_name),
+                                          syscheck.ignore_regex[i]))
+            {
+                return(0);
+            }
+            i++;
+        }
+    }
+
 
     /* Opening the directory given */
     dp = opendir(dir_name);
