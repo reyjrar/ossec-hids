@@ -324,6 +324,29 @@ int IsDir(char *file)
     return(-1);
 }
 
+int IsNetworkFS(char *dir)
+{
+#ifndef WIN32
+    struct statfs stfs;
+    /* ignore NFS (0x6969) or CIFS (0xFF534D42) mounts */
+    if ( statfs(dir, &stfs) == 0 ) {
+        if ( (stfs.f_type == 0x6969) || (stfs.f_type == 0xFF534D42) ) {
+            return(1); /* NFS/CIFS path */
+        }
+        else {
+            return(0);
+        }
+    }
+    else {
+      /* do something with the error? */
+      return(-1);
+    }
+#else
+   // TODO: Someone help out and implement this on WIN32?
+   return(0);
+#endif
+}
+
 
 int CreatePID(char *name, int pid)
 {

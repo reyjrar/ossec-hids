@@ -17,6 +17,17 @@
 /* Functions to handle operation with files
  */
 
+/* We need statfs() */
+#ifndef WIN32
+#ifdef FreeBSD
+#include <sys/mount.h>
+#elif Darwin
+#include <sys/mount.h>
+#else
+#include <sys/vfs.h>
+#endif
+#endif
+
 #ifndef __FILE_H
 
 #define __FILE_H
@@ -29,6 +40,8 @@ void OS_SetName(char *name);
 int File_DateofChange(char *file);
 
 int IsDir(char *file);
+
+int IsNetworkFS(char *name);
 
 int CreatePID(char *name, int pid);
 

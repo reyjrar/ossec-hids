@@ -577,6 +577,7 @@ int Read_Syscheck(XML_NODE node, void *configp, void *mailp)
     char *xml_disabled = "disabled";
     char *xml_scan_on_start = "scan_on_start";
     char *xml_prefilter_cmd = "prefilter_cmd";
+    char *xml_scan_network_fs = "scan_network_fs";
 
     /* Configuration example
     <directories check_all="yes">/etc,/usr/bin</directories>
@@ -671,6 +672,20 @@ int Read_Syscheck(XML_NODE node, void *configp, void *mailp)
                 syscheck->scan_on_start = 1;
             else if(strcmp(node[i]->content, "no") == 0)
                 syscheck->scan_on_start = 0;
+            else
+            {
+                merror(XML_VALUEERR,ARGV0, node[i]->element, node[i]->content);
+                return(OS_INVALID);
+            }
+        }
+
+        /* Getting if xml_scan_network_fs. */
+        else if(strcmp(node[i]->element, xml_scan_network_fs) == 0)
+        {
+            if(strcmp(node[i]->content, "yes") == 0)
+                syscheck->scan_network_fs = 1;
+            else if(strcmp(node[i]->content, "no") == 0)
+                syscheck->scan_network_fs = 0;
             else
             {
                 merror(XML_VALUEERR,ARGV0, node[i]->element, node[i]->content);
