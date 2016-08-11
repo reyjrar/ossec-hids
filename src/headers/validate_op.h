@@ -10,6 +10,8 @@
 #ifndef __VALIDATE_H
 #define __VALIDATE_H
 
+#include <sys/socket.h>
+
 /* IP structure */
 typedef struct _os_ip {
     char *ip;
